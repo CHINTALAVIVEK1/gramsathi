@@ -43,15 +43,9 @@ const VoiceGov = () => {
 
   const categories = ['All', 'Agriculture', 'Health', 'Business', 'Education', 'Women'];
 
-  // Mock speech recognition
+  // Voice assistant - Coming Soon
   const startListening = () => {
-    setIsListening(true);
-    // Simulate speech recognition
-    setTimeout(() => {
-      setTranscript('मुझे किसान योजना के बारे में जानकारी चाहिए');
-      setIsListening(false);
-      handleVoiceQuery('मुझे किसान योजना के बारे में जानकारी चाहिए');
-    }, 3000);
+    alert('🎤 Voice Assistant Coming Soon!\n\nWe are working on advanced voice recognition features. For now, please use the text chat below to get information about government schemes.');
   };
 
   const stopListening = () => {
@@ -113,11 +107,7 @@ const VoiceGov = () => {
   };
 
   const speakText = (text) => {
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'hi-IN';
-      speechSynthesis.speak(utterance);
-    }
+    alert('🔊 Text-to-Speech Coming Soon!\n\nAdvanced voice features are under development. The text response is available above.');
   };
 
   return (
@@ -152,28 +142,28 @@ const VoiceGov = () => {
               
               {/* Voice Control */}
               <div className="text-center mb-6">
-                <button
-                  onClick={isListening ? stopListening : startListening}
-                  className={`w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 ${
-                    isListening 
-                      ? 'bg-red-500 hover:bg-red-600 animate-pulse' 
-                      : 'bg-purple-600 hover:bg-purple-700'
-                  }`}
-                >
-                  {isListening ? (
-                    <MicOff className="text-white" size={32} />
-                  ) : (
+                <div className="relative">
+                  <button
+                    onClick={startListening}
+                    className="w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 bg-gray-400 hover:bg-gray-500 cursor-pointer relative"
+                  >
                     <Mic className="text-white" size={32} />
-                  )}
-                </button>
+                    <div className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full">
+                      Soon
+                    </div>
+                  </button>
+                </div>
                 <p className="mt-4 text-gray-600">
-                  {isListening ? 'सुन रहा हूं... बोलिए' : 'माइक दबाकर बोलें'}
+                  🎤 Voice Assistant - Coming Soon!
                 </p>
-                {transcript && (
-                  <div className="mt-4 p-3 bg-gray-100 rounded-lg">
-                    <p className="text-sm text-gray-700">आपने कहा: "{transcript}"</p>
-                  </div>
-                )}
+                <p className="text-sm text-gray-500 mt-2">
+                  Advanced voice recognition features are under development
+                </p>
+                <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                  <p className="text-sm text-blue-700">
+                    💡 <strong>For now:</strong> Use the text chat below to get information about government schemes
+                  </p>
+                </div>
               </div>
 
               {/* Chat Interface */}
@@ -207,9 +197,11 @@ const VoiceGov = () => {
                                 {msg.type === 'bot' && (
                                   <button
                                     onClick={() => speakText(msg.message)}
-                                    className="ml-2 text-gray-600 hover:text-gray-800"
+                                    className="ml-2 text-gray-400 hover:text-gray-600 relative"
+                                    title="Text-to-Speech Coming Soon"
                                   >
                                     <Volume2 size={12} />
+                                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-orange-400 rounded-full"></span>
                                   </button>
                                 )}
                               </div>
@@ -299,10 +291,12 @@ const VoiceGov = () => {
                   
                   <button
                     onClick={() => speakText(`${selectedScheme.name} योजना के बारे में: ${selectedScheme.description}. लाभ: ${selectedScheme.benefits}`)}
-                    className="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center"
+                    className="w-full bg-gray-400 text-white py-2 px-4 rounded-lg hover:bg-gray-500 transition-colors flex items-center justify-center relative"
+                    title="Text-to-Speech Coming Soon"
                   >
                     <Volume2 className="mr-2" size={16} />
-                    सुनें
+                    सुनें (Coming Soon)
+                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-orange-400 rounded-full"></span>
                   </button>
                 </div>
               </div>

@@ -47,6 +47,7 @@ export const authAPI = {
 };
 
 export const weatherAPI = {
+  getCities: () => api.get('/api/weather/cities'),
   getCurrentWeather: (location) => api.get(`/api/weather/current/${location}`),
   getForecast: (location, days = 5) => api.get(`/api/weather/forecast/${location}?days=${days}`),
 };

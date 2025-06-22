@@ -3,13 +3,29 @@ import { Sprout, Cloud, Bug, MapPin, Calendar, Thermometer } from 'lucide-react'
 import { weatherAPI } from '../../utils/api';
 
 const KrishiConnect = () => {
-  const [selectedDistrict, setSelectedDistrict] = useState('');
+  const [selectedCity, setSelectedCity] = useState('');
   const [weatherData, setWeatherData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [availableCities, setAvailableCities] = useState([]);
 
-  const districts = [
-    'Agra', 'Aligarh', 'Allahabad', 'Bareilly', 'Ghaziabad', 'Kanpur', 
-    'Lucknow', 'Meerut', 'Moradabad', 'Saharanpur', 'Varanasi'
-  ];
+  // Load cities on component mount
+  useEffect(() => {
+    const loadCities = async () => {
+      try {
+        const response = await weatherAPI.getCities();
+        setAvailableCities(response.cities || []);
+      } catch (error) {
+        console.error('Failed to load cities:', error);
+        // Fallback to major Indian cities
+        setAvailableCities([
+          'Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Chennai', 'Kolkata', 'Pune', 'Ahmedabad',
+          'Jaipur', 'Lucknow', 'Kanpur', 'Nagpur', 'Indore', 'Agra', 'Varanasi', 'Patna',
+          'Bhopal', 'Ludhiana', 'Coimbatore', 'Kochi', 'Visakhapatnam', 'Vadodara'
+        ]);
+      }
+    };
+    loadCities();
+  }, []);
 
   const cropRecommendations = [
     {
@@ -50,41 +66,60 @@ const KrishiConnect = () => {
     }
   ];
 
-  const handleDistrictChange = async (district) => {
-    setSelectedDistrict(district);
+  const handleCityChange = async (city) => {
+    setSelectedCity(city);
+    setLoading(true);
 
     try {
       // Fetch real weather data from API
-      const weatherResponse = await weatherAPI.getCurrentWeather(district);
-      const forecastResponse = await weatherAPI.getForecast(district, 3);
+      const weatherResponse = await weatherAPI.getCurrentWeather(city);
+      const forecastResponse = await weatherAPI.getForecast(city, 3);
 
       setWeatherData({
+        location: weatherResponse.location,
+        state: weatherResponse.state,
+        country: weatherResponse.country,
         temperature: weatherResponse.temperature,
+        feelsLike: weatherResponse.feels_like,
         humidity: weatherResponse.humidity,
         description: weatherResponse.description,
         windSpeed: weatherResponse.wind_speed,
         pressure: weatherResponse.pressure,
-        forecast: forecastResponse.forecast || [
-          { day: 'Today', temp: `${weatherResponse.temperature}°C`, condition: weatherResponse.description },
-          { day: 'Tomorrow', temp: '30°C', condition: 'Sunny' },
-          { day: 'Day 3', temp: '26°C', condition: 'Light Rain' }
-        ]
+        visibility: weatherResponse.visibility,
+        icon: weatherResponse.icon,
+        forecast: forecastResponse.forecast.map((day, index) => ({
+          day: index === 0 ? 'Today' : index === 1 ? 'Tomorrow' : `Day ${index + 1}`,
+          date: day.date,
+          temp: `${Math.round(day.temperature_max)}°C`,
+          tempMin: `${Math.round(day.temperature_min)}°C`,
+          condition: day.description,
+          humidity: day.humidity,
+          icon: day.icon
+        }))
       });
     } catch (error) {
       console.error('Failed to fetch weather data:', error);
       // Fallback to mock data
       setWeatherData({
+        location: city,
+        state: 'India',
+        country: 'IN',
         temperature: 28,
+        feelsLike: 32,
         humidity: 65,
         description: 'Partly cloudy',
         windSpeed: 12,
         pressure: 1013,
+        visibility: 10,
+        icon: '02d',
         forecast: [
-          { day: 'Today', temp: '28°C', condition: 'Partly Cloudy' },
-          { day: 'Tomorrow', temp: '30°C', condition: 'Sunny' },
-          { day: 'Day 3', temp: '26°C', condition: 'Light Rain' }
+          { day: 'Today', temp: '28°C', tempMin: '22°C', condition: 'Partly Cloudy', humidity: 65 },
+          { day: 'Tomorrow', temp: '30°C', tempMin: '24°C', condition: 'Sunny', humidity: 60 },
+          { day: 'Day 3', temp: '26°C', tempMin: '20°C', condition: 'Light Rain', humidity: 75 }
         ]
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -106,24 +141,36 @@ const KrishiConnect = () => {
           </p>
         </div>
 
-        {/* District Selection */}
+        {/* City Selection */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
           <h2 className="text-xl font-semibold mb-4 flex items-center">
             <MapPin className="mr-2 text-green-600" size={20} />
-            Select Your District
+            Select Your City
           </h2>
-          <select
-            value={selectedDistrict}
-            onChange={(e) => handleDistrictChange(e.target.value)}
-            className="w-full md:w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-          >
-            <option value="">Choose your district</option>
-            {districts.map((district) => (
-              <option key={district} value={district}>
-                {district}
-              </option>
-            ))}
-          </select>
+          <div className="flex flex-col md:flex-row gap-4 items-start">
+            <select
+              value={selectedCity}
+              onChange={(e) => handleCityChange(e.target.value)}
+              className="w-full md:w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              disabled={loading}
+            >
+              <option value="">Choose your city</option>
+              {availableCities.map((city) => (
+                <option key={city} value={city}>
+                  {city}
+                </option>
+              ))}
+            </select>
+            {loading && (
+              <div className="flex items-center text-green-600">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600 mr-2"></div>
+                Loading weather data...
+              </div>
+            )}
+          </div>
+          <p className="text-sm text-gray-500 mt-2">
+            🌍 Real-time weather data for all major Indian cities
+          </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -131,35 +178,95 @@ const KrishiConnect = () => {
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-xl font-semibold mb-4 flex items-center">
               <Cloud className="mr-2 text-blue-600" size={20} />
-              Weather Information
+              Real-Time Weather Information
             </h2>
             {weatherData ? (
               <div>
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <div className="text-3xl font-bold text-gray-900">
-                      {weatherData.temperature}°C
+                {/* Current Weather */}
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <div className="text-3xl font-bold text-gray-900">
+                        {weatherData.temperature}°C
+                      </div>
+                      <div className="text-gray-600 capitalize">{weatherData.description}</div>
+                      <div className="text-sm text-gray-500">
+                        Feels like {weatherData.feelsLike}°C
+                      </div>
+                      <div className="text-sm text-blue-600 font-medium mt-1">
+                        📍 {weatherData.location}{weatherData.state && `, ${weatherData.state}`}
+                      </div>
                     </div>
-                    <div className="text-gray-600">{weatherData.description}</div>
-                    <div className="text-sm text-gray-500">
-                      Humidity: {weatherData.humidity}% | Wind: {weatherData.windSpeed} km/h
+                    <div className="text-center">
+                      {weatherData.icon && (
+                        <img
+                          src={`https://openweathermap.org/img/wn/${weatherData.icon}@2x.png`}
+                          alt={weatherData.description}
+                          className="w-16 h-16 mx-auto"
+                        />
+                      )}
+                      <Thermometer className="text-orange-500 mx-auto mt-2" size={24} />
                     </div>
                   </div>
-                  <Thermometer className="text-orange-500" size={48} />
-                </div>
-                <div className="grid grid-cols-3 gap-2">
-                  {weatherData.forecast.map((day, index) => (
-                    <div key={index} className="text-center p-2 bg-gray-50 rounded">
-                      <div className="text-sm font-medium">{day.day}</div>
-                      <div className="text-lg font-bold">{day.temp}</div>
-                      <div className="text-xs text-gray-600">{day.condition}</div>
+
+                  {/* Weather Details */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                    <div className="text-center p-3 bg-blue-50 rounded-lg">
+                      <div className="text-sm text-gray-600">Humidity</div>
+                      <div className="text-lg font-bold text-blue-600">{weatherData.humidity}%</div>
                     </div>
-                  ))}
+                    <div className="text-center p-3 bg-green-50 rounded-lg">
+                      <div className="text-sm text-gray-600">Wind Speed</div>
+                      <div className="text-lg font-bold text-green-600">{weatherData.windSpeed} km/h</div>
+                    </div>
+                    <div className="text-center p-3 bg-purple-50 rounded-lg">
+                      <div className="text-sm text-gray-600">Pressure</div>
+                      <div className="text-lg font-bold text-purple-600">{weatherData.pressure} hPa</div>
+                    </div>
+                    {weatherData.visibility && (
+                      <div className="text-center p-3 bg-orange-50 rounded-lg">
+                        <div className="text-sm text-gray-600">Visibility</div>
+                        <div className="text-lg font-bold text-orange-600">{weatherData.visibility} km</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* 3-Day Forecast */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-3">3-Day Forecast</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {weatherData.forecast.map((day, index) => (
+                      <div key={index} className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200">
+                        <div className="text-sm font-medium text-blue-800">{day.day}</div>
+                        {day.date && (
+                          <div className="text-xs text-blue-600 mb-2">{new Date(day.date).toLocaleDateString()}</div>
+                        )}
+                        {day.icon && (
+                          <img
+                            src={`https://openweathermap.org/img/wn/${day.icon}.png`}
+                            alt={day.condition}
+                            className="w-10 h-10 mx-auto mb-2"
+                          />
+                        )}
+                        <div className="text-lg font-bold text-gray-900">
+                          {day.temp}
+                          {day.tempMin && <span className="text-sm text-gray-600"> / {day.tempMin}</span>}
+                        </div>
+                        <div className="text-xs text-gray-600 capitalize">{day.condition}</div>
+                        {day.humidity && (
+                          <div className="text-xs text-blue-600 mt-1">💧 {day.humidity}%</div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             ) : (
               <div className="text-center py-8 text-gray-500">
-                Select a district to view weather information
+                <Cloud className="mx-auto mb-4 text-gray-400" size={48} />
+                <p>Select a city to view real-time weather information</p>
+                <p className="text-sm mt-2">🌤️ Powered by OpenWeatherMap API</p>
               </div>
             )}
           </div>
