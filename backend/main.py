@@ -1,12 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from app.api import auth, weather, schemes, health, marketplace, soil
 import os
-from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
+# Environment variables are automatically loaded by Render
 
 app = FastAPI(
     title="GramSathi API",
@@ -23,8 +20,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Static files
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# Static files not needed for API-only deployment
 
 # API routes
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
