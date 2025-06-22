@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingBag, Plus, Search, MapPin, Phone, Star, Filter } from 'lucide-react';
+import { ShoppingBag, Search, MapPin, Phone, Star } from 'lucide-react';
 
 const GrameenBazaar = () => {
   const [activeTab, setActiveTab] = useState('browse');

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Phone, Mail, MapPin, Heart } from 'lucide-react';
+import { Phone, Mail, Heart } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -68,29 +68,29 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">Support</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-gray-300 hover:text-primary-400 transition-colors">
+                <button className="text-gray-300 hover:text-primary-400 transition-colors text-left">
                   Help Center
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-primary-400 transition-colors">
+                <button className="text-gray-300 hover:text-primary-400 transition-colors text-left">
                   Contact Us
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-primary-400 transition-colors">
+                <button className="text-gray-300 hover:text-primary-400 transition-colors text-left">
                   Privacy Policy
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-primary-400 transition-colors">
+                <button className="text-gray-300 hover:text-primary-400 transition-colors text-left">
                   Terms of Service
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-primary-400 transition-colors">
+                <button className="text-gray-300 hover:text-primary-400 transition-colors text-left">
                   FAQ
-                </a>
+                </button>
               </li>
             </ul>
           </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Heart, MessageCircle, Phone, AlertTriangle, Calendar, User } from 'lucide-react';
+import { Heart, MessageCircle, Phone, AlertTriangle, Calendar } from 'lucide-react';
 
 const ArogyaSetu = () => {
   const [symptoms, setSymptoms] = useState([]);

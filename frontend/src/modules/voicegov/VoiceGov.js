@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Mic, MicOff, Volume2, MessageCircle, Search, FileText, Phone } from 'lucide-react';
+import React, { useState } from 'react';
+import { Mic, Volume2, MessageCircle, FileText, Phone } from 'lucide-react';
 
 const VoiceGov = () => {
-  const [isListening, setIsListening] = useState(false);
-  const [transcript, setTranscript] = useState('');
   const [chatMessages, setChatMessages] = useState([]);
   const [currentMessage, setCurrentMessage] = useState('');
   const [selectedScheme, setSelectedScheme] = useState(null);
@@ -41,31 +39,9 @@ const VoiceGov = () => {
     }
   ];
 
-  const categories = ['All', 'Agriculture', 'Health', 'Business', 'Education', 'Women'];
-
   // Voice assistant - Coming Soon
   const startListening = () => {
     alert('🎤 Voice Assistant Coming Soon!\n\nWe are working on advanced voice recognition features. For now, please use the text chat below to get information about government schemes.');
-  };
-
-  const stopListening = () => {
-    setIsListening(false);
-  };
-
-  const handleVoiceQuery = (query) => {
-    const response = generateResponse(query);
-    setChatMessages(prev => [
-      ...prev,
-      { type: 'user', message: query, isVoice: true },
-      { type: 'bot', message: response.text, schemes: response.schemes }
-    ]);
-    
-    // Text-to-speech simulation
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(response.text);
-      utterance.lang = 'hi-IN';
-      speechSynthesis.speak(utterance);
-    }
   };
 
   const generateResponse = (query) => {
